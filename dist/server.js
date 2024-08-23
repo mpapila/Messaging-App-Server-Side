@@ -19,12 +19,20 @@ const socket_io_1 = require("socket.io");
 const client_1 = require("@prisma/client");
 const routes_1 = __importDefault(require("./routes/routes"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const compression_1 = __importDefault(require("compression"));
+const helmet_1 = __importDefault(require("helmet"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
+app.use((0, compression_1.default)());
+app.use(helmet_1.default.contentSecurityPolicy({
+    directives: {
+        "script-src": ["'self' 'unsafe-inline'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+}));
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.REACT_APP_BASE_URL,
         methods: ["GET", "POST"]
     }
 });
