@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id        Int     @id @default(autoincrement())
+  username  String  @unique(map: "username_UNIQUE") @db.VarChar(45)
+  password  String  @db.VarChar(255)
+  email     String  @unique(map: "email_UNIQUE") @db.VarChar(45)
+  followers String? @db.VarChar(45)
+  chatRoom  String? @db.VarChar(45)
+
+  sentFriendRequests     Friend[]  @relation("requester")
+  receivedFriendRequests Friend[]  @relation("receiver")
+  sentMessages           Message[] @relation("UserToMessage")
+}
+
+model Friend {
+  id          Int      @id @default(autoincrement())
+  requesterId Int
+  receiverId  Int
+  status      String   @default("pending") @db.VarChar(20) // 'pending', 'accepted', 'declined'
+  createdAt   DateTime @default(now())
+  chatRoom    String?  @db.VarChar(45)
+
+  requester users @relation("requester", fields: [requesterId], references: [id])
+  receiver  users @relation("receiver", fields: [receiverId], references: [id])
+
+  @@unique([requesterId, receiverId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  chatRoom  String   @db.VarChar(45)
+  senderId  Int
+
+  sender users @relation("UserToMessage", fields: [senderId], references: [id])
+
+  @@index([chatRoom])
+}
