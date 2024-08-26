@@ -86,7 +86,11 @@ const acceptPendingList = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const { id, username: myName } = req.user || {};
         const myId = id !== undefined ? [id] : [];
         const acceptedUser = yield prisma.friend.findMany({
-            where: { status: 'accepted' },
+            where: {
+                status: 'accepted', requesterId: {
+                    in: myId
+                }
+            },
             select: { receiverId: true }
         });
         const pendingUsers = yield prisma.friend.findMany({

@@ -79,7 +79,11 @@ export const acceptPendingList = async (req: Request, res: Response) => {
         const { id, username: myName } = req.user || {};
         const myId = id !== undefined ? [id] : [];
         const acceptedUser = await prisma.friend.findMany({
-            where: { status: 'accepted' },
+            where: {
+                status: 'accepted', requesterId: {
+                    in: myId
+                }
+            },
             select: { receiverId: true }
         })
         const pendingUsers = await prisma.friend.findMany({
