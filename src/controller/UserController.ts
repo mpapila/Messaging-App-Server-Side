@@ -184,6 +184,16 @@ export const addFriend = async (req: Request, res: Response) => {
             const additionalData = {
                 specialMessage: 'This is a special response for receiver 1!'
             };
+            const chatRoom = newRequest.chatRoom || 'defaultChatRoom';
+
+            const initialMessage = await prisma.message.create({
+                data: {
+                    content: 'Hello! Thank you for using my Chat Application. You can add anyone to your chat list, but they need to accept your friend request first. When you receive a friend request, you will notice a red notification bell.',
+                    createdAt: new Date(),
+                    chatRoom,
+                    senderId: 1
+                }
+            })
             return res.status(200).json({ newRequest, additionalData });
         }
         res.status(200).json(newRequest);
@@ -217,6 +227,16 @@ export const acceptFriend = async (req: Request, res: Response) => {
                 status: 'accepted',
             },
         });
+        const chatRoom = updateFriend.chatRoom || 'defaultChatRoom';
+
+        const initialMessage = await prisma.message.create({
+            data: {
+                content: 'Hello Thank you for accepting my request!',
+                createdAt: new Date(),
+                chatRoom,
+                senderId: updateFriend.requesterId
+            }
+        })
         console.log(updateFriend)
         res.status(200).json({ updateFriend })
     } catch (err) {
