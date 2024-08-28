@@ -151,18 +151,23 @@ io.on('connection', async (socket) => {
         io.to(messageInput.chatRoomId).emit('chat message', messageData);
     })
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason, details) => {
         console.log('A user disconnected')
+        console.log(reason);
+
+        // the low-level reason of the disconnection, for example "xhr post error"
+        console.log(details.message);
+
+        // some additional description, for example the status code of the HTTP response
+        console.log(details.description);
+
+        // some additional context, for example the XMLHttpRequest object
+        console.log(details.context);
     })
 
 })
 
-io.engine.on("connection_error", (err) => {
-    console.log(err.req);      // the request object
-    console.log(err.code);     // the error code, for example 1
-    console.log(err.message);  // the error message, for example "Session ID unknown"
-    console.log(err.context);  // some additional error context
-});
+
 
 app.use(express.static('public'));
 
